@@ -5,3 +5,4 @@ my-faces/
 *.log
 .DS_Store
 Thumbs.db
+test-layouts.html

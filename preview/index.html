@@ -134,79 +134,90 @@
     .tab-page { display: none; }
     .tab-page.active { display: block; }
 
-    /* --- Sensor Controls --- */
+    /* --- Sensor Controls (3-col grid) --- */
+    #sensorControls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
     .sensor-group {
-      margin-bottom: 16px;
       background: #111118;
       border: 1px solid #1a1a2e;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
     }
 
     .sensor-header {
       display: flex;
       align-items: center;
-      padding: 10px 14px;
+      padding: 6px 8px;
       background: #14141e;
-      cursor: pointer;
-      user-select: none;
+      gap: 6px;
     }
 
-    .sensor-header:hover { background: #181828; }
-
     .sensor-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      margin-right: 10px;
+      font-size: 11px;
+      flex-shrink: 0;
     }
 
     .sensor-name {
-      flex: 1;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
 
     .sensor-value {
-      font-size: 13px;
+      font-size: 11px;
       font-family: monospace;
       color: #7c9fff;
-      margin-right: 8px;
+    }
+
+    .sensor-unit {
+      font-size: 10px;
+      color: #555;
     }
 
     .sensor-body {
-      padding: 10px 14px;
-      border-top: 1px solid #1a1a2e;
+      padding: 4px 8px 6px;
     }
 
     .slider-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
+      gap: 4px;
+      margin-bottom: 3px;
     }
 
+    .slider-row:last-child { margin-bottom: 0; }
+
     .slider-row label {
-      font-size: 12px;
-      color: #888;
-      min-width: 70px;
+      font-size: 10px;
+      color: #666;
+      min-width: 32px;
     }
 
     .slider-row input[type="range"] {
       flex: 1;
       accent-color: #7c9fff;
-      height: 4px;
+      height: 3px;
+      min-width: 0;
     }
 
     .slider-row .val {
-      font-size: 12px;
+      font-size: 10px;
       font-family: monospace;
       color: #7c9fff;
-      min-width: 40px;
+      min-width: 28px;
       text-align: right;
     }
 
@@ -351,130 +362,10 @@
     </div>
 
     <div class="tab-content">
-      <!-- Sensors Tab -->
+      <!-- Sensors Tab (dynamically populated) -->
       <div class="tab-page active" id="tab-sensors">
         <div class="section-title">Live Sensor Data</div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#1a2a4a;color:#7c9fff">&#9829;</div>
-            <span class="sensor-name">Heart Rate</span>
-            <span class="sensor-value" id="val-heart">72</span>
-            <span style="color:#555">bpm</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Rate</label>
-              <input type="range" min="40" max="200" value="72" data-sensor="heart" data-prop="current">
-              <span class="val" data-display="heart.current">72</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#1a3a2a;color:#4ade80">&#9889;</div>
-            <span class="sensor-name">Battery</span>
-            <span class="sensor-value" id="val-battery">85</span>
-            <span style="color:#555">%</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Level</label>
-              <input type="range" min="0" max="100" value="85" data-sensor="battery" data-prop="current">
-              <span class="val" data-display="battery.current">85</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#2a2a1a;color:#fbbf24">&#128694;</div>
-            <span class="sensor-name">Steps</span>
-            <span class="sensor-value" id="val-step">6420</span>
-            <span style="color:#555">steps</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Current</label>
-              <input type="range" min="0" max="20000" value="6420" data-sensor="step" data-prop="current">
-              <span class="val" data-display="step.current">6420</span>
-            </div>
-            <div class="slider-row">
-              <label>Target</label>
-              <input type="range" min="1000" max="30000" value="10000" data-sensor="step" data-prop="target">
-              <span class="val" data-display="step.target">10000</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#1a2a3a;color:#60a5fa">&#9729;</div>
-            <span class="sensor-name">Weather</span>
-            <span class="sensor-value" id="val-weather">18</span>
-            <span style="color:#555">&deg;C</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>High</label>
-              <input type="range" min="-20" max="50" value="18" data-sensor="weather-high" data-prop="high">
-              <span class="val" data-display="weather.high">18</span>
-            </div>
-            <div class="slider-row">
-              <label>Low</label>
-              <input type="range" min="-20" max="50" value="11" data-sensor="weather-low" data-prop="low">
-              <span class="val" data-display="weather.low">11</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#2a1a2a;color:#c084fc">&#128293;</div>
-            <span class="sensor-name">Calories</span>
-            <span class="sensor-value" id="val-calorie">312</span>
-            <span style="color:#555">kcal</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Burned</label>
-              <input type="range" min="0" max="3000" value="312" data-sensor="calorie" data-prop="current">
-              <span class="val" data-display="calorie.current">312</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#1a2a2a;color:#2dd4bf">O&#8322;</div>
-            <span class="sensor-name">SpO2</span>
-            <span class="sensor-value" id="val-spo2">97</span>
-            <span style="color:#555">%</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Level</label>
-              <input type="range" min="70" max="100" value="97" data-sensor="spo2" data-prop="current">
-              <span class="val" data-display="spo2.current">97</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sensor-group">
-          <div class="sensor-header">
-            <div class="sensor-icon" style="background:#2a2a1a;color:#f59e0b">&#9888;</div>
-            <span class="sensor-name">Stress</span>
-            <span class="sensor-value" id="val-stress">42</span>
-          </div>
-          <div class="sensor-body">
-            <div class="slider-row">
-              <label>Level</label>
-              <input type="range" min="0" max="100" value="42" data-sensor="stress" data-prop="current">
-              <span class="val" data-display="stress.current">42</span>
-            </div>
-          </div>
-        </div>
+        <div id="sensorControls"></div>
       </div>
 
       <!-- Editor Tab -->
@@ -581,47 +472,133 @@ WatchFace({
       });
     });
 
-    // --- Sensor Sliders ---
-    document.querySelectorAll('input[data-sensor]').forEach(slider => {
-      slider.addEventListener('input', (e) => {
-        const sensorKey = e.target.dataset.sensor;
-        const prop = e.target.dataset.prop;
-        const value = Number(e.target.value);
+    // --- Dynamic Sensor Controls ---
+    const SENSOR_DEFS = {
+      heart:     { name: 'Heart Rate',  icon: '&#9829;', bg: '#1a2a4a', fg: '#7c9fff', unit: 'bpm',
+                   controls: [{ prop: 'current', label: 'Rate', min: 40, max: 200 }] },
+      battery:   { name: 'Battery',     icon: '&#9889;', bg: '#1a3a2a', fg: '#4ade80', unit: '%',
+                   controls: [{ prop: 'current', label: 'Level', min: 0, max: 100 }] },
+      step:      { name: 'Steps',       icon: '&#128694;', bg: '#2a2a1a', fg: '#fbbf24', unit: 'steps',
+                   controls: [{ prop: 'current', label: 'Current', min: 0, max: 20000 },
+                              { prop: 'target', label: 'Target', min: 1000, max: 30000 }] },
+      weather:   { name: 'Weather',     icon: '&#9729;', bg: '#1a2a3a', fg: '#60a5fa', unit: '°C',
+                   controls: [{ prop: 'high', label: 'High', min: -20, max: 50, special: 'weather-high' },
+                              { prop: 'low', label: 'Low', min: -20, max: 50, special: 'weather-low' }] },
+      calorie:   { name: 'Calories',    icon: '&#128293;', bg: '#2a1a2a', fg: '#c084fc', unit: 'kcal',
+                   controls: [{ prop: 'current', label: 'Burned', min: 0, max: 3000 }] },
+      spo2:      { name: 'SpO2',        icon: 'O&#8322;', bg: '#1a2a2a', fg: '#2dd4bf', unit: '%',
+                   controls: [{ prop: 'current', label: 'Level', min: 70, max: 100 }] },
+      stress:    { name: 'Stress',      icon: '&#9888;', bg: '#2a2a1a', fg: '#f59e0b', unit: '',
+                   controls: [{ prop: 'current', label: 'Level', min: 0, max: 100 }] },
+      distance:  { name: 'Distance',    icon: '&#10230;', bg: '#1a1a3a', fg: '#7c9fff', unit: 'km',
+                   controls: [{ prop: 'current', label: 'Distance', min: 0, max: 50, step: 0.1 }] },
+      sleep:     { name: 'Sleep',       icon: '&#9789;', bg: '#1a2a3a', fg: '#22d3ee', unit: 'h',
+                   controls: [{ prop: 'current', label: 'Hours', min: 0, max: 12, step: 0.5 }] },
+      body_temp: { name: 'Body Temp',   icon: '&#9650;', bg: '#2a1a1a', fg: '#f472b6', unit: '°',
+                   controls: [{ prop: 'current', label: 'Temp', min: 35, max: 42, step: 0.1 }] },
+      stand:     { name: 'Standing',    icon: '&#9899;', bg: '#1a2a1a', fg: '#4ade80', unit: '',
+                   controls: [{ prop: 'current', label: 'Count', min: 0, max: 12 },
+                              { prop: 'target', label: 'Target', min: 1, max: 16 }] },
+      pai:       { name: 'PAI',         icon: '&#9733;', bg: '#2a2a1a', fg: '#fbbf24', unit: '',
+                   controls: [{ prop: 'dailypai', label: 'Daily', min: 0, max: 75 },
+                              { prop: 'totalpai', label: 'Weekly', min: 0, max: 525 }] },
+      hrv:       { name: 'HRV',         icon: '&#8767;', bg: '#1a1a2a', fg: '#c084fc', unit: 'ms',
+                   controls: [{ prop: 'current', label: 'HRV', min: 10, max: 120 }] },
+      floor:     { name: 'Floors',      icon: '&#9632;', bg: '#1a2a2a', fg: '#2dd4bf', unit: '',
+                   controls: [{ prop: 'current', label: 'Floors', min: 0, max: 50 }] },
+    };
 
-        // Update display
-        const displayEl = e.target.parentElement.querySelector('.val');
-        if (displayEl) displayEl.textContent = value;
+    function buildSensorControls() {
+      const container = document.getElementById('sensorControls');
+      container.innerHTML = '';
 
-        // Update header values
-        if (sensorKey === 'heart') {
-          document.getElementById('val-heart').textContent = value;
-        } else if (sensorKey === 'battery') {
-          document.getElementById('val-battery').textContent = value;
-        } else if (sensorKey === 'step' && prop === 'current') {
-          document.getElementById('val-step').textContent = value;
-        } else if (sensorKey === 'calorie') {
-          document.getElementById('val-calorie').textContent = value;
-        } else if (sensorKey === 'spo2') {
-          document.getElementById('val-spo2').textContent = value;
-        } else if (sensorKey === 'stress') {
-          document.getElementById('val-stress').textContent = value;
-        }
+      const active = __preview.activeSensors;
+      if (active.size === 0) {
+        container.innerHTML = '<div style="color:#555;font-size:13px;padding:20px 0">No sensors active. Run a watchface to see controls.</div>';
+        return;
+      }
 
-        // Update mock sensor data
-        if (sensorKey.startsWith('weather-')) {
-          const forecast = __preview.sensorData.weather.forecastData;
-          if (sensorKey === 'weather-high') {
-            forecast[0].high = value;
-            document.getElementById('val-weather').textContent = value;
-          } else {
-            forecast[0].low = value;
-          }
-          __preview.updateSensorData('weather', __preview.sensorData.weather);
+      for (const sensorName of active) {
+        if (sensorName === 'time') continue; // time is always ticking, no slider needed
+        const def = SENSOR_DEFS[sensorName];
+        if (!def) continue;
+
+        const data = __preview.sensorData[sensorName];
+        const mainValue = def.controls[0];
+        let displayVal = '';
+        if (mainValue.special) {
+          const forecast = __preview.sensorData.weather?.forecastData;
+          displayVal = forecast?.[0]?.[mainValue.prop] ?? '--';
         } else {
-          __preview.updateSensorData(sensorKey, { [prop]: value });
+          displayVal = data?.[mainValue.prop] ?? '--';
         }
+
+        let slidersHtml = '';
+        for (const ctrl of def.controls) {
+          const stepAttr = ctrl.step ? `step="${ctrl.step}"` : '';
+          let val;
+          if (ctrl.special) {
+            const forecast = __preview.sensorData.weather?.forecastData;
+            val = forecast?.[0]?.[ctrl.prop] ?? 0;
+          } else {
+            val = data?.[ctrl.prop] ?? 0;
+          }
+          slidersHtml += `
+            <div class="slider-row">
+              <label>${ctrl.label}</label>
+              <input type="range" min="${ctrl.min}" max="${ctrl.max}" value="${val}" ${stepAttr}
+                     data-sensor="${ctrl.special || sensorName}" data-prop="${ctrl.prop}">
+              <span class="val">${val}</span>
+            </div>`;
+        }
+
+        container.innerHTML += `
+          <div class="sensor-group">
+            <div class="sensor-header">
+              <div class="sensor-icon" style="background:${def.bg};color:${def.fg}">${def.icon}</div>
+              <span class="sensor-name">${def.name}</span>
+              <span class="sensor-value">${displayVal}</span>
+              <span class="sensor-unit">${def.unit}</span>
+            </div>
+            <div class="sensor-body">${slidersHtml}</div>
+          </div>`;
+      }
+
+      // Bind slider events
+      container.querySelectorAll('input[data-sensor]').forEach(slider => {
+        slider.addEventListener('input', (e) => {
+          const sensorKey = e.target.dataset.sensor;
+          const prop = e.target.dataset.prop;
+          const raw = e.target.value;
+          const value = raw.includes('.') ? parseFloat(raw) : parseInt(raw, 10);
+
+          // Update display value next to slider
+          const valEl = e.target.parentElement.querySelector('.val');
+          if (valEl) valEl.textContent = value;
+
+          // Update header value
+          const group = e.target.closest('.sensor-group');
+          const headerVal = group?.querySelector('.sensor-value');
+
+          // Update mock sensor data
+          if (sensorKey.startsWith('weather-')) {
+            const forecast = __preview.sensorData.weather.forecastData;
+            if (sensorKey === 'weather-high') {
+              forecast[0].high = value;
+              if (headerVal) headerVal.textContent = value;
+            } else {
+              forecast[0].low = value;
+            }
+            __preview.updateSensorData('weather', __preview.sensorData.weather);
+          } else {
+            __preview.updateSensorData(sensorKey, { [prop]: value });
+            if (prop === SENSOR_DEFS[sensorKey]?.controls[0]?.prop && headerVal) {
+              headerVal.textContent = value;
+            }
+          }
+        });
       });
-    });
+    }
 
     // --- Console capture ---
     const consoleEl = document.getElementById('consoleOutput');
@@ -678,6 +655,7 @@ WatchFace({
         console.error('[preview] Error: ' + e.message);
       }
       __preview.render();
+      buildSensorControls();
     }
 
     // --- Widget Inspector ---

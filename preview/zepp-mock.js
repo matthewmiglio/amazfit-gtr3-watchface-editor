@@ -73,6 +73,7 @@
 
   // --- Sensor API ---
   const sensorListeners = {};
+  const activeSensors = new Set();
 
   function createSensor(sensorId) {
     const name = Object.entries(hmSensor.id).find(([, v]) => v === sensorId)?.[0]?.toLowerCase();
@@ -80,6 +81,8 @@
       console.warn(`[mock] Unknown sensor: ${sensorId}`);
       return {};
     }
+
+    activeSensors.add(name);
 
     const data = sensorData[name];
     const sensor = { ...data, event: {} };
@@ -527,8 +530,10 @@
     ctx.stroke();
   }
 
+  // Image cache for renderImg
+  const _imgCache = {};
+
   function renderImg(p) {
-    // In mock mode, draw a placeholder rectangle for images
     const x = p.x || 0;
     const y = p.y || 0;
     const w = p.w || 50;
@@ -536,17 +541,29 @@
 
     if (p._loaded) {
       ctx.drawImage(p._loaded, x, y, w, h);
-    } else {
-      ctx.fillStyle = '#222233';
-      ctx.fillRect(x, y, w, h);
-      ctx.strokeStyle = '#444466';
-      ctx.strokeRect(x, y, w, h);
-      if (p.src) {
-        ctx.fillStyle = '#666688';
-        ctx.font = '9px monospace';
-        ctx.fillText(p.src.split('/').pop() || 'img', x + 2, y + h / 2 + 3, w - 4);
-      }
+      return;
     }
+
+    if (p.src) {
+      const key = p.src;
+      if (_imgCache[key]) {
+        if (_imgCache[key].complete && _imgCache[key].naturalWidth > 0) {
+          p._loaded = _imgCache[key];
+          ctx.drawImage(p._loaded, x, y, w, h);
+        }
+        // else still loading — show placeholder
+        return;
+      }
+      const img = new Image();
+      _imgCache[key] = img;
+      img.onload = () => { scheduleRender(); };
+      img.src = key;
+      return;
+    }
+
+    // No src — placeholder
+    ctx.fillStyle = '#222233';
+    ctx.fillRect(x, y, w, h);
   }
 
   function renderArc(p) {
@@ -733,6 +750,7 @@
     widgets.length = 0;
     watchfaceInstance = null;
     Object.keys(sensorListeners).forEach(k => delete sensorListeners[k]);
+    activeSensors.clear();
     nextWidgetId = 1;
   }
 
@@ -740,6 +758,12 @@
     if (sensorData[name]) {
       Object.assign(sensorData[name], data);
       fireSensorEvent(name, 'CHANGE');
+      // Trigger resume_call on all WIDGET_DELEGATE widgets so text values refresh
+      widgets.forEach(w => {
+        if (w._resumeCall) {
+          try { w._resumeCall(); } catch (e) { /* ignore */ }
+        }
+      });
       scheduleRender();
     }
   }
@@ -764,6 +788,7 @@
     updateSensorData,
     getSensorData,
     sensorData,
+    activeSensors,
     RESOLUTION,
     widgets,
   };
