@@ -37,7 +37,7 @@ function cli(args) {
 }
 
 // --- Cleanup helper ---
-const TMP_PROJECT = path.join(ROOT, '_test_tmp_face');
+const TMP_PROJECT = path.join(ROOT, 'my-faces', '_test_tmp_face');
 
 function cleanup() {
   if (fs.existsSync(TMP_PROJECT)) {
@@ -133,7 +133,7 @@ console.log('\n  Lint Tests\n');
 // ============================================================
 
 test('lint passes on valid project', () => {
-  const out = cli(`lint _test_tmp_face`);
+  const out = cli(`lint my-faces/_test_tmp_face`);
   assert(out.includes('All checks passed'), 'Should pass lint');
 });
 
@@ -154,7 +154,7 @@ console.log('\n  Build Tests\n');
 // ============================================================
 
 test('build produces dist output', () => {
-  const out = cli(`build _test_tmp_face`);
+  const out = cli(`build my-faces/_test_tmp_face`);
   assert(out.includes('Build complete'), 'Should complete build');
   const distDir = path.join(TMP_PROJECT, 'dist');
   assert(fs.existsSync(distDir), 'dist/ should exist');

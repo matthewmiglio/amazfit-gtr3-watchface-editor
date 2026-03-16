@@ -6,9 +6,12 @@ Development suite for creating, previewing, and building Amazfit GTR 3 watchface
 
 ```bash
 npm install
-node bin/cli.js create my-face        # scaffold a new watchface
-node bin/cli.js preview my-face       # open browser preview with hot reload
-node bin/cli.js build my-face         # validate and bundle
+
+node bin/cli.js create {your-watchface-name}            # scaffold into my-faces/{your-watchface-name}
+
+node bin/cli.js preview my-faces/{your-watchface-name}  # open browser preview with hot reload
+
+node bin/cli.js build my-faces/{your-watchface-name}    # validate and bundle
 ```
 
 ## Commands
@@ -34,7 +37,7 @@ The preview renders a 454x454 round canvas simulating the GTR 3 display. Feature
 ## Project Structure (scaffolded)
 
 ```
-my-face/
+my-faces/{your-watchface-name}/
   app.json               Zepp OS configuration
   app.js                 App lifecycle
   sensor.config.json     Sensor connection config

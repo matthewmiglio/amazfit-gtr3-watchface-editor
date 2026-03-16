@@ -1,6 +1,7 @@
 .claude/
 node_modules/
 dist/
+my-faces/
 *.log
 .DS_Store
 Thumbs.db

@@ -123,7 +123,9 @@ function run(positional, flags) {
     process.exit(1);
   }
 
-  const projectDir = path.resolve(process.cwd(), name);
+  const facesDir = path.join(suiteRoot, 'my-faces');
+  fs.mkdirSync(facesDir, { recursive: true });
+  const projectDir = path.join(facesDir, name);
 
   if (fs.existsSync(projectDir)) {
     console.error(`Directory "${name}" already exists.`);
@@ -140,10 +142,11 @@ function run(positional, flags) {
   fs.writeFileSync(path.join(projectDir, 'app.js'), generateAppJs());
   fs.writeFileSync(path.join(projectDir, 'sensor.config.json'), generateSensorConfig());
 
+  const relPath = `my-faces/${name}`;
   console.log(`  Created: ${projectDir}`);
   console.log(`
   Project structure:
-    ${name}/
+    ${relPath}/
       app.json               Zepp OS app configuration
       app.js                 App lifecycle
       sensor.config.json     Sensor connection config
@@ -153,9 +156,8 @@ function run(positional, flags) {
         images/              Image assets (454x454)
 
   Next steps:
-    cd ${name}
-    gtr3 preview .           Launch browser preview
-    gtr3 build .             Validate & bundle
+    node bin/cli.js preview ${relPath}   Launch browser preview
+    node bin/cli.js build ${relPath}     Validate & bundle
 `);
 }
 

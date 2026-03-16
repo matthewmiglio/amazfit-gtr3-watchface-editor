@@ -52,6 +52,10 @@
     pai: { dailypai: 35, totalpai: 82 },
     sleep: { current: 7.5 },
     stand: { current: 8, target: 12 },
+    body_temp: { current: 36.6 },
+    fat_burring: { current: 0, target: 30 },
+    floor: { current: 5 },
+    hrv: { current: 45 },
   };
 
   // Update time every second
@@ -135,6 +139,7 @@
       TIME: 1, HEART: 2, BATTERY: 3, STEP: 4, CALORIE: 5,
       DISTANCE: 6, WEATHER: 7, SPO2: 8, STRESS: 9, PAI: 10,
       SLEEP: 11, STAND: 12, FAT_BURRING: 13, BODY_TEMP: 14, MUSIC: 15,
+      FLOOR: 16, HRV: 17,
     },
     event: {
       CHANGE: 'CHANGE',
