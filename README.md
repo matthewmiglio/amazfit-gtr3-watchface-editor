@@ -14,6 +14,7 @@ node bin/cli.js preview my-faces/{your-watchface-name}  # open browser preview w
 node bin/cli.js build my-faces/{your-watchface-name}    # validate and bundle
 ```
 <img width="1918" height="839" alt="image" src="https://github.com/user-attachments/assets/2f75afba-bf0b-4e23-ae4b-2ac14d44af79" />
+
 ## Commands
 
 | Command | Description |
