@@ -1,0 +1,26 @@
+{
+  "name": "amazfit-gtr3-watchface-editor",
+  "version": "1.0.0",
+  "description": "Development suite for creating, previewing, and building Amazfit GTR 3 watchfaces",
+  "main": "index.js",
+  "bin": {
+    "gtr3": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run.js",
+    "lint": "node bin/cli.js lint",
+    "check": "node bin/cli.js lint && node tests/run.js"
+  },
+  "keywords": [
+    "amazfit",
+    "gtr3",
+    "watchface",
+    "zepp-os",
+    "wearable"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "ws": "^8.14.2"
+  }
+}

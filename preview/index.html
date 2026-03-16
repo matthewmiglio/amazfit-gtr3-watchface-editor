@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTR 3 Watchface Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* --- Left: Watch Preview --- */
+    .preview-panel {
+      flex: 0 0 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d14;
+      border-right: 1px solid #1a1a2e;
+    }
+
+    .watch-frame {
+      position: relative;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #2a2a3a, #111118);
+      box-shadow:
+        0 0 0 4px #1a1a28,
+        0 0 0 8px #0f0f18,
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .watch-frame::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 20px;
+      height: 50px;
+      background: linear-gradient(to right, #2a2a3a, #1a1a28);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    #watchCanvas {
+      border-radius: 50%;
+      width: 454px;
+      height: 454px;
+    }
+
+    .preview-label {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #555;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .preview-status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    /* --- Right: Controls --- */
+    .controls-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .controls-header {
+      padding: 16px 20px;
+      background: #0f0f18;
+      border-bottom: 1px solid #1a1a2e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .controls-header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e0e0e0;
+      flex: 1;
+    }
+
+    .controls-header .badge {
+      font-size: 11px;
+      background: #1a3a2a;
+      color: #4ade80;
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      background: #0d0d14;
+      border-bottom: 1px solid #1a1a2e;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover { color: #aaa; }
+    .tab.active { color: #7c9fff; border-bottom-color: #7c9fff; }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+    /* --- Sensor Controls --- */
+    .sensor-group {
+      margin-bottom: 16px;
+      background: #111118;
+      border: 1px solid #1a1a2e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .sensor-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      background: #14141e;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sensor-header:hover { background: #181828; }
+
+    .sensor-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .sensor-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .sensor-value {
+      font-size: 13px;
+      font-family: monospace;
+      color: #7c9fff;
+      margin-right: 8px;
+    }
+
+    .sensor-body {
+      padding: 10px 14px;
+      border-top: 1px solid #1a1a2e;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .slider-row label {
+      font-size: 12px;
+      color: #888;
+      min-width: 70px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: #7c9fff;
+      height: 4px;
+    }
+
+    .slider-row .val {
+      font-size: 12px;
+      font-family: monospace;
+      color: #7c9fff;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* --- Console --- */
+    .console-area {
+      background: #08080c;
+      border: 1px solid #1a1a2e;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .console-line { color: #888; }
+    .console-line.error { color: #ff6b6b; }
+    .console-line.warn { color: #fbbf24; }
+
+    /* --- Widget Inspector --- */
+    .widget-list {
+      font-size: 12px;
+    }
+
+    .widget-item {
+      padding: 8px 12px;
+      background: #111118;
+      border: 1px solid #1a1a2e;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-family: monospace;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .widget-type {
+      background: #1a1a2e;
+      color: #7c9fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .widget-props {
+      color: #888;
+      font-size: 11px;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* --- Code Editor --- */
+    .code-area {
+      width: 100%;
+      min-height: 400px;
+      background: #08080c;
+      border: 1px solid #1a1a2e;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 13px;
+      color: #e0e0e0;
+      resize: vertical;
+      line-height: 1.6;
+      tab-size: 2;
+    }
+
+    .code-area:focus {
+      outline: none;
+      border-color: #7c9fff44;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #1a1a2e;
+      background: #14141e;
+      color: #e0e0e0;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { background: #1a1a2e; border-color: #7c9fff44; }
+    .btn.primary { background: #1a2a4a; border-color: #2a4a7a; color: #7c9fff; }
+    .btn.primary:hover { background: #2a3a5a; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .hot-reload-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #333;
+      display: inline-block;
+    }
+
+    .hot-reload-indicator.connected { background: #4ade80; }
+    .hot-reload-indicator.disconnected { background: #ff6b6b; }
+  </style>
+</head>
+<body>
+  <!-- Watch Preview -->
+  <div class="preview-panel">
+    <div class="watch-frame">
+      <canvas id="watchCanvas"></canvas>
+    </div>
+    <div class="preview-label">Amazfit GTR 3 &mdash; 454 &times; 454</div>
+    <div class="preview-status">
+      <span class="hot-reload-indicator" id="wsStatus"></span>
+      <span id="wsLabel">Connecting...</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-panel">
+    <div class="controls-header">
+      <h1>Watchface Studio</h1>
+      <span class="badge" id="faceName">No face loaded</span>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="sensors">Sensors</div>
+      <div class="tab" data-tab="editor">Editor</div>
+      <div class="tab" data-tab="widgets">Widgets</div>
+      <div class="tab" data-tab="console">Console</div>
+    </div>
+
+    <div class="tab-content">
+      <!-- Sensors Tab -->
+      <div class="tab-page active" id="tab-sensors">
+        <div class="section-title">Live Sensor Data</div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#1a2a4a;color:#7c9fff">&#9829;</div>
+            <span class="sensor-name">Heart Rate</span>
+            <span class="sensor-value" id="val-heart">72</span>
+            <span style="color:#555">bpm</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Rate</label>
+              <input type="range" min="40" max="200" value="72" data-sensor="heart" data-prop="current">
+              <span class="val" data-display="heart.current">72</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#1a3a2a;color:#4ade80">&#9889;</div>
+            <span class="sensor-name">Battery</span>
+            <span class="sensor-value" id="val-battery">85</span>
+            <span style="color:#555">%</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Level</label>
+              <input type="range" min="0" max="100" value="85" data-sensor="battery" data-prop="current">
+              <span class="val" data-display="battery.current">85</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#2a2a1a;color:#fbbf24">&#128694;</div>
+            <span class="sensor-name">Steps</span>
+            <span class="sensor-value" id="val-step">6420</span>
+            <span style="color:#555">steps</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Current</label>
+              <input type="range" min="0" max="20000" value="6420" data-sensor="step" data-prop="current">
+              <span class="val" data-display="step.current">6420</span>
+            </div>
+            <div class="slider-row">
+              <label>Target</label>
+              <input type="range" min="1000" max="30000" value="10000" data-sensor="step" data-prop="target">
+              <span class="val" data-display="step.target">10000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#1a2a3a;color:#60a5fa">&#9729;</div>
+            <span class="sensor-name">Weather</span>
+            <span class="sensor-value" id="val-weather">18</span>
+            <span style="color:#555">&deg;C</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>High</label>
+              <input type="range" min="-20" max="50" value="18" data-sensor="weather-high" data-prop="high">
+              <span class="val" data-display="weather.high">18</span>
+            </div>
+            <div class="slider-row">
+              <label>Low</label>
+              <input type="range" min="-20" max="50" value="11" data-sensor="weather-low" data-prop="low">
+              <span class="val" data-display="weather.low">11</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#2a1a2a;color:#c084fc">&#128293;</div>
+            <span class="sensor-name">Calories</span>
+            <span class="sensor-value" id="val-calorie">312</span>
+            <span style="color:#555">kcal</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Burned</label>
+              <input type="range" min="0" max="3000" value="312" data-sensor="calorie" data-prop="current">
+              <span class="val" data-display="calorie.current">312</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#1a2a2a;color:#2dd4bf">O&#8322;</div>
+            <span class="sensor-name">SpO2</span>
+            <span class="sensor-value" id="val-spo2">97</span>
+            <span style="color:#555">%</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Level</label>
+              <input type="range" min="70" max="100" value="97" data-sensor="spo2" data-prop="current">
+              <span class="val" data-display="spo2.current">97</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-header">
+            <div class="sensor-icon" style="background:#2a2a1a;color:#f59e0b">&#9888;</div>
+            <span class="sensor-name">Stress</span>
+            <span class="sensor-value" id="val-stress">42</span>
+          </div>
+          <div class="sensor-body">
+            <div class="slider-row">
+              <label>Level</label>
+              <input type="range" min="0" max="100" value="42" data-sensor="stress" data-prop="current">
+              <span class="val" data-display="stress.current">42</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor Tab -->
+      <div class="tab-page" id="tab-editor">
+        <div class="btn-row">
+          <button class="btn primary" id="btnRun">Run Watchface</button>
+          <button class="btn" id="btnReset">Reset</button>
+          <button class="btn" id="btnLoadFile">Load from Project</button>
+        </div>
+        <div class="section-title">Watchface Code</div>
+        <textarea class="code-area" id="codeEditor" spellcheck="false">// Watchface code — edit and click "Run Watchface"
+WatchFace({
+  onInit() {},
+
+  build() {
+    // Background
+    hmUI.createWidget(hmUI.widget.FILL_RECT, {
+      x: 0, y: 0, w: 454, h: 454,
+      color: 0x000000,
+    });
+
+    // Time display
+    hmUI.createWidget(hmUI.widget.TEXT_TIME, {
+      x: 0, y: 140, w: 454, h: 100,
+      color: 0xffffff,
+      text_size: 72,
+    });
+
+    // Heart rate
+    const heart = hmSensor.createSensor(hmSensor.id.HEART);
+    const hrText = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 150, y: 260, w: 154, h: 40,
+      text: '♥ ' + heart.current + ' bpm',
+      text_size: 22,
+      color: 0xff4444,
+      align_h: 1,
+    });
+
+    // Update heart rate on change
+    heart.addEventListener(heart.event.CHANGE, () => {
+      hrText.setProperty(hmUI.prop.MORE, {
+        text: '♥ ' + heart.current + ' bpm',
+      });
+    });
+
+    // Battery arc
+    const battery = hmSensor.createSensor(hmSensor.id.BATTERY);
+    hmUI.createWidget(hmUI.widget.ARC_PROGRESS, {
+      center_x: 227, center_y: 227, radius: 218,
+      start_angle: -90, end_angle: 270,
+      color: 0x00cc66,
+      bg_color: 0x1a1a2e,
+      line_width: 6,
+      level: battery.current,
+    });
+
+    // Steps
+    const step = hmSensor.createSensor(hmSensor.id.STEP);
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 150, y: 310, w: 154, h: 30,
+      text: step.current + ' steps',
+      text_size: 18,
+      color: 0x4ade80,
+      align_h: 1,
+    });
+  },
+
+  onDestroy() {},
+});
+</textarea>
+      </div>
+
+      <!-- Widgets Tab -->
+      <div class="tab-page" id="tab-widgets">
+        <div class="section-title">Active Widgets</div>
+        <div class="widget-list" id="widgetList"></div>
+      </div>
+
+      <!-- Console Tab -->
+      <div class="tab-page" id="tab-console">
+        <div class="btn-row">
+          <button class="btn" id="btnClearConsole">Clear</button>
+        </div>
+        <div class="section-title">Output</div>
+        <div class="console-area" id="consoleOutput"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="zepp-mock.js"></script>
+  <script>
+    // --- Init ---
+    const canvas = document.getElementById('watchCanvas');
+    __preview.initPreview(canvas);
+
+    // --- Tabs ---
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'widgets') refreshWidgetList();
+      });
+    });
+
+    // --- Sensor Sliders ---
+    document.querySelectorAll('input[data-sensor]').forEach(slider => {
+      slider.addEventListener('input', (e) => {
+        const sensorKey = e.target.dataset.sensor;
+        const prop = e.target.dataset.prop;
+        const value = Number(e.target.value);
+
+        // Update display
+        const displayEl = e.target.parentElement.querySelector('.val');
+        if (displayEl) displayEl.textContent = value;
+
+        // Update header values
+        if (sensorKey === 'heart') {
+          document.getElementById('val-heart').textContent = value;
+        } else if (sensorKey === 'battery') {
+          document.getElementById('val-battery').textContent = value;
+        } else if (sensorKey === 'step' && prop === 'current') {
+          document.getElementById('val-step').textContent = value;
+        } else if (sensorKey === 'calorie') {
+          document.getElementById('val-calorie').textContent = value;
+        } else if (sensorKey === 'spo2') {
+          document.getElementById('val-spo2').textContent = value;
+        } else if (sensorKey === 'stress') {
+          document.getElementById('val-stress').textContent = value;
+        }
+
+        // Update mock sensor data
+        if (sensorKey.startsWith('weather-')) {
+          const forecast = __preview.sensorData.weather.forecastData;
+          if (sensorKey === 'weather-high') {
+            forecast[0].high = value;
+            document.getElementById('val-weather').textContent = value;
+          } else {
+            forecast[0].low = value;
+          }
+          __preview.updateSensorData('weather', __preview.sensorData.weather);
+        } else {
+          __preview.updateSensorData(sensorKey, { [prop]: value });
+        }
+      });
+    });
+
+    // --- Console capture ---
+    const consoleEl = document.getElementById('consoleOutput');
+    const origLog = console.log;
+    const origError = console.error;
+    const origWarn = console.warn;
+
+    function appendConsole(msg, type = '') {
+      const line = document.createElement('div');
+      line.className = 'console-line ' + type;
+      line.textContent = typeof msg === 'string' ? msg : JSON.stringify(msg);
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    console.log = (...args) => {
+      origLog.apply(console, args);
+      appendConsole(args.join(' '));
+    };
+    console.error = (...args) => {
+      origError.apply(console, args);
+      appendConsole(args.join(' '), 'error');
+    };
+    console.warn = (...args) => {
+      origWarn.apply(console, args);
+      appendConsole(args.join(' '), 'warn');
+    };
+
+    document.getElementById('btnClearConsole').addEventListener('click', () => {
+      consoleEl.innerHTML = '';
+    });
+
+    // --- Code Editor ---
+    const codeEditor = document.getElementById('codeEditor');
+
+    document.getElementById('btnRun').addEventListener('click', () => {
+      runCode(codeEditor.value);
+    });
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+      __preview.resetWidgets();
+      __preview.render();
+      appendConsole('[preview] Reset');
+    });
+
+    function runCode(code) {
+      __preview.resetWidgets();
+      try {
+        const fn = new Function(code);
+        fn();
+        appendConsole('[preview] Watchface loaded');
+        document.getElementById('faceName').textContent = 'Running';
+      } catch (e) {
+        console.error('[preview] Error: ' + e.message);
+      }
+      __preview.render();
+    }
+
+    // --- Widget Inspector ---
+    function refreshWidgetList() {
+      const list = document.getElementById('widgetList');
+      const typeNames = {};
+      for (const [name, val] of Object.entries(hmUI.widget)) {
+        typeNames[val] = name;
+      }
+
+      list.innerHTML = __preview.widgets.map(w => {
+        const typeName = typeNames[w._type] || `Unknown(${w._type})`;
+        const props = Object.entries(w._props)
+          .filter(([k]) => !k.startsWith('_'))
+          .map(([k, v]) => `${k}=${typeof v === 'function' ? 'fn' : JSON.stringify(v)}`)
+          .join(', ');
+        return `<div class="widget-item">
+          <span class="widget-type">${typeName}</span>
+          <span class="widget-props">${props}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // --- WebSocket Hot Reload ---
+    let ws = null;
+    const wsStatus = document.getElementById('wsStatus');
+    const wsLabel = document.getElementById('wsLabel');
+
+    function connectWS() {
+      try {
+        ws = new WebSocket('ws://localhost:3457');
+        ws.onopen = () => {
+          wsStatus.className = 'hot-reload-indicator connected';
+          wsLabel.textContent = 'Hot reload connected';
+        };
+        ws.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'reload' && msg.code) {
+              codeEditor.value = msg.code;
+              runCode(msg.code);
+              appendConsole('[hot-reload] Watchface reloaded');
+            } else if (msg.type === 'sensor-update') {
+              __preview.updateSensorData(msg.sensor, msg.data);
+            }
+          } catch (err) {
+            console.error('[ws] Parse error:', err);
+          }
+        };
+        ws.onclose = () => {
+          wsStatus.className = 'hot-reload-indicator disconnected';
+          wsLabel.textContent = 'Disconnected — retrying...';
+          setTimeout(connectWS, 3000);
+        };
+        ws.onerror = () => {};
+      } catch (e) {
+        wsStatus.className = 'hot-reload-indicator disconnected';
+        wsLabel.textContent = 'No server';
+        setTimeout(connectWS, 5000);
+      }
+    }
+
+    connectWS();
+
+    // --- Tab key support in editor ---
+    codeEditor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+        codeEditor.value = codeEditor.value.substring(0, start) + '  ' + codeEditor.value.substring(end);
+        codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+      }
+    });
+
+    // --- Auto-run the default code on load ---
+    runCode(codeEditor.value);
+  </script>
+</body>
+</html>
