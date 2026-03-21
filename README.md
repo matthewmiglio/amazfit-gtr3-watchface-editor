@@ -67,9 +67,52 @@ TIME, HEART, BATTERY, STEP, CALORIE, WEATHER, SPO2, STRESS, PAI, SLEEP, DISTANCE
 
 ## Deploying to Device
 
-After building, use the official Zepp OS Zeus CLI to install on your GTR 3:
+Install the Zeus CLI and deploy your watchface to a real device.
+
+### Prerequisites
+
+1. Install the Zeus CLI globally:
+   ```bash
+   npm i -g @zeppos/zeus-cli
+   ```
+2. Log in to your Zepp developer account:
+   ```bash
+   zeus login
+   ```
+3. Install the **Zepp** app on your phone and pair your watch
+4. In the Zepp app, enable **Developer Mode** (Profile > Settings > About > tap 7 times)
+
+### Device Configuration
+
+Make sure `app.json` has the correct `deviceSource` values for your watch model:
+
+| Model | deviceSource values |
+|-------|-------------------|
+| GTR 3 | 226, 227 |
+| GTR 3 Pro | 229, 230, 242, 6095106 |
+
+### Install via Bridge (recommended)
+
+This pushes the watchface directly to your watch over the local network:
 
 ```bash
-npm i -g @zeppos/zeus-cli
-zeus preview          # scan QR code with Zepp app
+cd my-faces/{your-watchface-name}
+zeus bridge
 ```
+
+Then in the bridge console:
+```
+bridge$ connect
+bridge$ install
+```
+
+The watchface will appear in your device's watchface list.
+
+### Install via QR Preview (alternative)
+
+```bash
+cd my-faces/{your-watchface-name}
+zeus preview
+```
+
+Scan the QR code using the **Zepp app scanner** (not your phone camera). This method uploads through Zepp's servers and can be unreliable.
